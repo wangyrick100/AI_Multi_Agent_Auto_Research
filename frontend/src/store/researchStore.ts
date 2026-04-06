@@ -40,7 +40,7 @@ const defaultConfig: ResearchConfig = {
   depth: 'balanced',
 }
 
-export const useResearchStore = create<ResearchStore>((set, get) => ({
+export const useResearchStore = create<ResearchStore>((set) => ({
   session: null,
   config: defaultConfig,
   activePanel: 'feed',

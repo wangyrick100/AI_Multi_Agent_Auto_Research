@@ -35,8 +35,8 @@ export function AgentFeed() {
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         <AnimatePresence initial={false}>
-          {visibleEvents.map((event, idx) => (
-            <EventCard key={`${event.timestamp}-${idx}`} event={event} />
+          {visibleEvents.map((agentEvent, idx) => (
+            <EventCard key={`${agentEvent.timestamp}-${idx}`} event={agentEvent} />
           ))}
         </AnimatePresence>
 
@@ -66,12 +66,11 @@ export function AgentFeed() {
   )
 }
 
-function EventCard({ event }: { event: AgentEvent }) {
-  const agent = AGENT_CONFIG[event.agent] ?? AGENT_CONFIG.orchestrator
-  const isPhase = PHASE_EVENTS.has(event.type)
-  const isError = event.type === 'agent_error' || event.type === 'error'
-
-  const data = event.data
+function EventCard({ event: agentEvent }: { event: AgentEvent }) {
+  const agent = AGENT_CONFIG[agentEvent.agent] ?? AGENT_CONFIG.orchestrator
+  const isPhase = PHASE_EVENTS.has(agentEvent.type)
+  const isError = agentEvent.type === 'agent_error' || agentEvent.type === 'error'
+  const data = agentEvent.data
 
   return (
     <motion.div
@@ -91,20 +90,20 @@ function EventCard({ event }: { event: AgentEvent }) {
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${agent.dotColor}`} />
           <span className={`text-xs font-semibold ${agent.color}`}>{agent.label}</span>
-          <span className="text-xs text-text-muted font-mono">{_formatEventType(event.type)}</span>
+          <span className="text-xs text-text-muted font-mono">{_formatEventType(agentEvent.type)}</span>
         </div>
         <span className="text-[10px] text-text-muted">
-          {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
+          {formatDistanceToNow(new Date(agentEvent.timestamp), { addSuffix: true })}
         </span>
       </div>
 
       {/* Message */}
       <p className={`text-sm ${isError ? 'text-red-400' : 'text-text-secondary'} leading-snug`}>
-        {event.message}
+        {String(agentEvent.message ?? '')}
       </p>
 
       {/* Data details — show relevant sub-data */}
-      {event.type === 'plan_ready' && Array.isArray(data.sub_queries) && (
+      {agentEvent.type === 'plan_ready' && Array.isArray(data.sub_queries) && (
         <div className="mt-2 space-y-1">
           {(data.sub_queries as Array<{ question: string; priority: number }>).map((sq, i) => (
             <div key={i} className="flex items-start gap-2 text-xs text-text-muted">
@@ -115,14 +114,16 @@ function EventCard({ event }: { event: AgentEvent }) {
         </div>
       )}
 
-      {event.type === 'search_results' && data.breakdown && (
+      {agentEvent.type === 'search_results' &&
+        typeof data.breakdown === 'object' &&
+        data.breakdown !== null && (
         <div className="flex gap-3 text-xs text-text-muted mt-1">
           <span className="text-agent-explorer">🌐 {(data.breakdown as Record<string,number>).web ?? 0} web</span>
           <span className="text-emerald-400">📄 {(data.breakdown as Record<string,number>).academic ?? 0} academic</span>
         </div>
       )}
 
-      {event.type === 'critique_ready' && typeof data.overall_quality === 'number' && (
+      {agentEvent.type === 'critique_ready' && typeof data.overall_quality === 'number' && (
         <div className="mt-2 space-y-1">
           <div className="flex items-center gap-2">
             <div className="flex-1 h-1.5 bg-bg-elevated rounded-full overflow-hidden">

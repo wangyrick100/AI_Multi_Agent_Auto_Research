@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 import uuid
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
@@ -107,6 +107,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str) -> None:
 
     queue = event_bus.create_queue(session_id)
     session_store.create(session_id, query="pending")
+    research_task: asyncio.Task | None = None
 
     try:
         # Wait for the start_research message
@@ -128,12 +129,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str) -> None:
             config = ResearchConfig()
 
         # Update session with real query
-        session_store.create(session_id, query=query)
+        session_store.update_query(session_id, query)
 
         # Launch research as a background task
-        research_task = asyncio.create_task(
-            orchestrator.run(query, session_id, config)
-        )
+        research_task = asyncio.create_task(orchestrator.run(query, session_id, config))
 
         # Stream events from queue to client until complete/error
         while True:
@@ -161,5 +160,9 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str) -> None:
         except Exception:
             pass
     finally:
+        if research_task and not research_task.done():
+            research_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await research_task
         event_bus.remove_queue(session_id)
         logger.info("WebSocket cleanup complete: %s", session_id)

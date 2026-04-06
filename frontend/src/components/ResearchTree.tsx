@@ -4,7 +4,6 @@ import ReactFlow, {
   Edge,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   BackgroundVariant,

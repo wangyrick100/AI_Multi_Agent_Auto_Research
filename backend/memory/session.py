@@ -27,6 +27,10 @@ class SessionStore:
     def get_info(self, session_id: str) -> Optional[SessionInfo]:
         return self._info.get(session_id)
 
+    def update_query(self, session_id: str, query: str) -> None:
+        if session_id in self._info:
+            self._info[session_id].query = query
+
     def update_status(self, session_id: str, status: str) -> None:
         if session_id in self._info:
             self._info[session_id].status = status

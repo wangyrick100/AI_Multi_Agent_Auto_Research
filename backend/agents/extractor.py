@@ -53,16 +53,29 @@ class ExtractorAgent:
             await emit(sid, "agent_thinking", "extractor", "No raw findings to extract from")
             return state
 
-        await emit(sid, "agent_extracting", "extractor", f"Extracting evidence from {len(raw)} raw results")
+        processed_keys = state.__dict__.setdefault("_processed_raw_keys", set())
 
-        # Deduplicate by URL + title to avoid redundant LLM calls
+        # Deduplicate across the entire session so later refinement rounds only
+        # extract from newly discovered findings.
         seen = set()
         unique_raw: List[Dict[str, Any]] = []
         for r in raw:
-            key = (r.get("url", ""), r.get("title", ""))
-            if key not in seen:
-                seen.add(key)
-                unique_raw.append(r)
+            key = (
+                r.get("url", ""),
+                r.get("title", ""),
+                r.get("search_type", ""),
+                r.get("sq_id", ""),
+            )
+            if key in processed_keys or key in seen:
+                continue
+            seen.add(key)
+            unique_raw.append(r)
+
+        if not unique_raw:
+            await emit(sid, "agent_thinking", "extractor", "No new findings to extract in this iteration")
+            return state
+
+        await emit(sid, "agent_extracting", "extractor", f"Extracting evidence from {len(unique_raw)} new raw results")
 
         # Find the sub-query text by ID for context
         sq_map: Dict[str, str] = {}
@@ -76,6 +89,7 @@ class ExtractorAgent:
             for r in unique_raw
         ]
         extracted_list = await asyncio.gather(*tasks, return_exceptions=True)
+        processed_keys.update(seen)
 
         new_evidence: List[Evidence] = []
         for raw_result, extracted in zip(unique_raw, extracted_list):

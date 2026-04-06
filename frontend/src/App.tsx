@@ -1,12 +1,21 @@
+import { Suspense, lazy } from 'react'
 import { useResearch } from './hooks/useResearch'
 import { Header } from './components/Header'
 import { ResearchInput } from './components/ResearchInput'
 import { AgentFeed } from './components/AgentFeed'
-import { ResearchTree } from './components/ResearchTree'
 import { EvidencePanel } from './components/EvidencePanel'
-import { SynthesisReport } from './components/SynthesisReport'
 import { ProgressBar } from './components/ProgressBar'
 import { Activity, GitBranch, Database, FileText, AlertCircle } from 'lucide-react'
+
+const ResearchTree = lazy(async () => {
+  const module = await import('./components/ResearchTree')
+  return { default: module.ResearchTree }
+})
+
+const SynthesisReport = lazy(async () => {
+  const module = await import('./components/SynthesisReport')
+  return { default: module.SynthesisReport }
+})
 
 export default function App() {
   const { session, activePanel, setActivePanel, cancelResearch } = useResearch()
@@ -74,7 +83,9 @@ export default function App() {
         <div className="hidden lg:flex flex-1 overflow-hidden">
           {/* Left: Research Tree */}
           <div className="w-72 flex-shrink-0 border-r border-bg-border bg-bg-surface overflow-hidden flex flex-col">
-            <ResearchTree />
+            <Suspense fallback={<PanelFallback label="Loading research plan..." />}>
+              <ResearchTree />
+            </Suspense>
           </div>
 
           {/* Center: Agent Feed */}
@@ -91,11 +102,19 @@ export default function App() {
         {/* Mobile: single panel */}
         <div className="flex lg:hidden flex-1 overflow-hidden">
           {activePanel === 'feed' && <div className="flex-1 overflow-hidden"><AgentFeed /></div>}
-          {activePanel === 'tree' && <div className="flex-1 overflow-hidden"><ResearchTree /></div>}
+          {activePanel === 'tree' && (
+            <div className="flex-1 overflow-hidden">
+              <Suspense fallback={<PanelFallback label="Loading research plan..." />}>
+                <ResearchTree />
+              </Suspense>
+            </div>
+          )}
           {activePanel === 'evidence' && <div className="flex-1 overflow-hidden"><EvidencePanel /></div>}
           {activePanel === 'report' && (
             <div className="flex-1 overflow-y-auto p-4">
-              <SynthesisReport />
+              <Suspense fallback={<PanelFallback label="Loading report..." padded />}>
+                <SynthesisReport />
+              </Suspense>
             </div>
           )}
         </div>
@@ -104,11 +123,21 @@ export default function App() {
         {(session.synthesis || session.status === 'synthesizing') && (
           <div className="hidden lg:block border-t border-bg-border max-h-[55vh] overflow-y-auto">
             <div className="p-6">
-              <SynthesisReport />
+              <Suspense fallback={<PanelFallback label="Loading report..." padded />}>
+                <SynthesisReport />
+              </Suspense>
             </div>
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function PanelFallback({ label, padded = false }: { label: string; padded?: boolean }) {
+  return (
+    <div className={`flex h-full items-center justify-center text-sm text-text-muted ${padded ? 'p-4' : ''}`}>
+      {label}
     </div>
   )
 }

@@ -25,6 +25,86 @@ If a public-facing patent reference is needed later, add the official filing met
 
 Important note: this README can help memorialize technical details, inventive framing, and ownership posture, but it does not itself create patent rights or replace legal advice. Patent protection arises from the filed patent application(s), issued claims if any, and applicable law.
 
+## Patent Preparation Record
+
+This README is intentionally structured so it can serve as the core technical specification and invention-support file for patent preparation relating to AutoResearch. It is intended to function as a primary technical reference for patent counsel, invention disclosure drafting, internal priority documentation, diligence review, and technical memorialization of the inventive concepts embodied in the codebase.
+
+In practical terms, this file is meant to be strong enough to serve as the core file in a patent preparation package when paired with the repository snapshot, architecture diagram, example runs, screenshots, and commit metadata corresponding to the version being documented. It should not be treated as a substitute for a formally drafted patent application, but it is written to support preparation of such an application at a much higher level of specificity than an ordinary README.
+
+### Patent Record Metadata
+
+| Field | Value |
+| --- | --- |
+| Working invention name | AutoResearch |
+| Candidate filing title | Multi-Agent Research Orchestration System with Critique-Driven Iterative Refinement |
+| Inventor | Yang (Rick) Wang, Ph.D. |
+| Owner | Yang (Rick) Wang, Ph.D. |
+| Status | Patent application filed; patent-pending positioning applies |
+| Core support assets | `README.md`, `mermaid-diagram.png`, `backend/`, `frontend/` |
+| Filing snapshot commit hash | Insert commit hash used for filing support record |
+| First reduction to practice date | Insert date if desired |
+| First public disclosure date | Insert date or state none |
+| Counsel or docket reference | Insert law firm, docket number, or matter reference if desired |
+
+### Candidate Patent Titles
+
+- Multi-Agent Research Orchestration System with Critique-Driven Iterative Refinement
+- System and Method for Evidence-Normalized AI Research Synthesis
+- Real-Time Multi-Agent Research Platform with Persistent Knowledge Reuse
+- System, Method, and Computer-Readable Medium for Structured AI Research Workflows
+
+### Technical Field
+
+This invention relates generally to artificial intelligence systems, computer-implemented research workflows, information retrieval, machine-assisted evidence analysis, distributed or modular agent orchestration, human-auditable AI systems, and memory-augmented computing platforms.
+
+More specifically, the invention concerns a computer-implemented system and method that decomposes a research objective into sub-questions, acquires source material from heterogeneous channels, normalizes the acquired material into structured evidence units, critiques the evidence base for quality and completeness, iteratively refines the research process when needed, and synthesizes the results into an auditable final report.
+
+### Background and Limitations of Existing Approaches
+
+Conventional large language model interfaces commonly generate direct answers from a single prompt without robust decomposition of the problem, without structured evidence normalization, without explicit critique of coverage, and without an auditable record of intermediate reasoning stages. Conventional search systems, on the other hand, may return ranked documents or snippets but do not generally convert those results into a normalized evidence model tied to a deliberate research plan and iterative quality-control loop.
+
+Existing approaches therefore suffer from one or more of the following limitations:
+
+- lack of structured decomposition of a research objective into targeted sub-questions
+- inability to compare coverage across multiple sub-questions in a unified state model
+- insufficient handling of contradictions, weak evidence, and missing angles
+- limited transparency into intermediate machine reasoning or workflow state
+- poor reuse of prior research results across future sessions
+- inefficient use of models because the same model is often used for all tasks regardless of cost or reasoning profile
+- weak provenance tracking between user query, sub-question, evidence item, critique result, and final synthesis
+
+### Technical Problems Addressed
+
+AutoResearch addresses technical problems that arise when trying to convert a broad research question into a trustworthy machine-assisted output. Those problems include:
+
+- how to orchestrate multiple specialized AI functions without collapsing the workflow into a single opaque generation step
+- how to retrieve heterogeneous raw material from multiple source channels while preserving provenance
+- how to normalize noisy retrieval output into a common evidence representation that downstream modules can evaluate consistently
+- how to detect when the evidence base is incomplete, contradictory, or too weak for final synthesis
+- how to trigger additional research iterations only when justified by measured quality gaps
+- how to expose the internal workflow to a user in real time without tightly coupling UI logic to research logic
+- how to persist reusable knowledge from prior sessions without requiring every session to start from zero
+
+### Summary of the Invention
+
+In one aspect, the invention provides a computer-implemented research system comprising an orchestrator, a plurality of specialized agents, one or more retrieval tools, a session-state memory layer, a persistent knowledge layer, and a real-time event transport layer, where the orchestrator coordinates a research workflow that includes planning, exploration, extraction, critique, optional refinement, and synthesis.
+
+In another aspect, the invention provides a computer-implemented method comprising receiving a research query, decomposing the query into sub-questions, executing parallel retrieval operations across one or more source channels, converting retrieved outputs into structured evidence objects, evaluating the evidence objects to determine research completeness and quality, conditionally performing one or more additional retrieval iterations based on critique output, generating a final synthesis report, and streaming workflow events to a client interface.
+
+In another aspect, the invention provides a non-transitory computer-readable medium storing instructions that, when executed by one or more processors, cause the processors to perform the foregoing method.
+
+In another aspect, the invention provides a human-auditable AI interface in which intermediate states of the research workflow are externalized as structured events and rendered to a user during execution.
+
+### Core Inventive Concepts
+
+1. A state-machine-governed multi-agent research workflow rather than a single monolithic prompt-response interaction.
+2. Critique-driven iterative refinement, where additional search and extraction passes are triggered by assessed evidence gaps and contradictions.
+3. A normalized evidence representation that sits between retrieval and synthesis and supports downstream quality analysis.
+4. Session-scoped event streaming that makes internal agent transitions and outputs observable in real time.
+5. Dual-memory behavior combining short-term session state and persistent long-term research reuse.
+6. Role-specialized model usage, allowing different reasoning resources to be allocated to planning, extraction, critique, and synthesis.
+7. Graceful degradation across retrieval and synthesis layers so the system remains operational even when preferred services fail.
+
 ## Executive Summary
 
 AutoResearch is designed as a research-grade orchestration system rather than a single-turn chatbot. Its core value proposition is that it does not jump directly from question to answer. Instead, it:
@@ -85,6 +165,74 @@ User Query
    |
    +--------------------------> Long-Term Knowledge Store
 ```
+
+## Claim-Oriented Embodiments
+
+### System Embodiment
+
+In one non-limiting system embodiment, AutoResearch comprises:
+
+- an input interface configured to receive a research query and runtime configuration
+- an orchestration engine configured to execute a multi-stage research workflow as a state machine
+- a planner agent configured to produce sub-questions and a research strategy
+- an explorer agent configured to run web and academic retrieval operations, including parallel retrieval across multiple sub-questions
+- an extractor agent configured to transform raw retrieval results into structured evidence objects
+- a critic agent configured to evaluate evidence quality, contradictions, and missing coverage, and to determine whether further refinement is warranted
+- a synthesizer agent configured to produce a final report, hypotheses, findings, and source mapping
+- a session memory store configured to persist in-flight research state during execution
+- a long-term memory store configured to preserve prior research outputs for future reuse
+- an event bus and client transport layer configured to stream intermediate workflow events to an external user interface
+
+### Method Embodiment
+
+In one non-limiting method embodiment, the system performs the following operations:
+
+1. receive a research query from a client
+2. initialize a session state object for the query
+3. generate a research plan including multiple sub-questions
+4. launch retrieval tasks for at least a subset of the sub-questions
+5. associate each retrieved item with provenance data including source and sub-question context
+6. transform retrieved items into structured evidence objects
+7. evaluate the evidence objects for quality, contradiction, and coverage
+8. determine whether additional retrieval or refinement is required
+9. if required, perform at least one additional retrieval pass based on refinement queries or unresolved sub-questions
+10. generate a synthesis output from the accumulated evidence base
+11. optionally persist the resulting research output into long-term memory
+12. emit structured runtime events to a client-facing interface during one or more of the foregoing steps
+
+### Computer-Readable Medium Embodiment
+
+In one non-limiting computer-readable medium embodiment, stored instructions cause one or more processors to:
+
+- coordinate specialized research agents using an explicit execution graph or state machine
+- maintain a shared research state across multiple workflow stages
+- normalize heterogeneous source material into a common evidence schema
+- iteratively refine the research process according to critique results
+- output both a final synthesis and an observable intermediate event stream
+
+### Alternative Embodiments Intended to be Covered
+
+To preserve breadth of the inventive disclosure, the following variants should be understood as within the intended technical scope of the invention unless expressly disclaimed in a formal patent filing:
+
+- model-provider agnostic implementations, including OpenAI, Anthropic, open-weight, proprietary, or domain-specific models
+- retrieval-provider agnostic implementations, including Tavily, DuckDuckGo, academic APIs, enterprise search systems, or private corpora
+- memory-backend agnostic implementations, including vector databases, graph stores, relational stores, object stores, or hybrid memory layers
+- transport agnostic interfaces, including WebSocket, Server-Sent Events, message queues, polling APIs, or local desktop event transports
+- single-tenant, multi-tenant, on-premises, private-cloud, regulated-environment, or edge-deployed implementations
+- domain-specialized embodiments for science, finance, medicine, law, engineering, intelligence, policy, or enterprise due diligence
+
+### Example Claim Families for Counsel Review
+
+The following are non-binding claim-orientation themes intended to help counsel, not formal claims:
+
+- a system claim directed to an orchestrated multi-agent research platform
+- a method claim directed to plan -> retrieve -> normalize -> critique -> refine -> synthesize processing
+- a computer-readable medium claim directed to processor-executable workflow control
+- a claim family directed to session-scoped event streaming of intermediate AI workflow states
+- a claim family directed to critique-triggered iterative refinement of machine-assisted research
+- a claim family directed to evidence normalization and provenance mapping between retrieval and synthesis
+- a claim family directed to long-term reuse of prior research outputs in later sessions
+- a claim family directed to differentiated model allocation across workflow stages
 
 ## End-to-End Pipeline
 
@@ -343,6 +491,34 @@ Server to client event example:
 }
 ```
 
+## Patent Support for Data Structures
+
+The data structures used by AutoResearch are not merely implementation details. They help evidence the internal machine state required to perform the claimed workflow and may be relevant to patent drafting because they define how information is transformed across stages.
+
+### `ResearchPlan`
+
+`ResearchPlan` captures the main query, a set of sub-questions, a strategy statement, and an estimated iteration count. From a patent-support perspective, this object shows that planning output is structured, inspectable, and suitable for downstream machine processing rather than being an unstructured text artifact.
+
+### `SubQuery`
+
+`SubQuery` captures the question text, rationale, optional hierarchy, and priority. This supports embodiments in which the system decomposes a research objective into multiple machine-manageable investigative units.
+
+### `Evidence`
+
+`Evidence` captures a claim, supporting text, source identity, source type, confidence, relevance, and sub-question linkage. This object is central to the inventive architecture because it provides a normalized intermediate representation between retrieval and synthesis.
+
+### `Critique`
+
+`Critique` captures findings, missing angles, contradictions, refinement queries, quality score, and a continuation decision. This object supports embodiments in which the system programmatically decides whether to terminate or continue a research loop based on machine-evaluated evidence sufficiency.
+
+### `SynthesisReport`
+
+`SynthesisReport` captures executive summary, hypotheses, key findings, methodology notes, knowledge gaps, markdown report content, and sources. This supports embodiments in which output is both human-readable and structurally tied to the evidence pipeline.
+
+### `ResearchState`
+
+`ResearchState` provides the shared state model spanning query, configuration, iteration count, plan, evidence, critique, synthesis, and error state. This supports the architecture of a stateful multi-stage workflow engine rather than an isolated prompt transaction.
+
 ## Configuration
 
 Environment variables are defined in `.env.example`.
@@ -490,6 +666,23 @@ Because this repository documents proprietary, patent-pending work, any producti
 If this system is referenced in internal documentation, diligence materials, invention disclosures, commercialization decks, or technical summaries, use the following attribution format:
 
 `AutoResearch, invented and authored by Yang (Rick) Wang, Ph.D. Proprietary and patent-pending. All rights reserved.`
+
+## Filing Package Checklist
+
+When using this README as the core file in a patent preparation package, preserve it together with the following artifacts:
+
+- repository commit hash for the exact version being documented
+- PDF export of this README with creation date and version identifier
+- `mermaid-diagram.png` and any additional architecture diagrams
+- representative screenshots of the frontend plan, evidence, and synthesis views
+- one or more sample research sessions with input, intermediate events, and final output
+- source code snapshot of `backend/` and `frontend/`
+- inventor declaration details, ownership details, and public-disclosure status
+- any prior invention disclosure forms, docket references, or counsel annotations
+
+## Core File Usage Note
+
+This README is intended to be sufficiently detailed to serve as the core technical file for patent preparation related to AutoResearch. It captures the invention title space, technical field, background, technical problems addressed, inventive concepts, system and method embodiments, claim-oriented themes, core data structures, implementation details, and filing-support checklist. For actual filing, patent counsel should translate this material into a formal specification, abstract, claims, figures list, cross-reference sections, and jurisdiction-specific filing package.
 
 ## Closing Statement
 

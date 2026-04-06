@@ -166,6 +166,169 @@ User Query
    +--------------------------> Long-Term Knowledge Store
 ```
 
+## Patent-Style Figures
+
+The following figures are included to make this README usable as a core invention-support document for patent preparation. They are drafted as technical source figures in Mermaid format so they can be reviewed quickly, versioned with the codebase, and later converted into formal patent drawing sheets by counsel or a patent draftsman if needed.
+
+For filing purposes, these figures should be understood as conceptual support figures that describe the inventive system, workflow, data transformations, and interface behavior. In a formal patent application, they may be redrawn as black-and-white line figures, renumbered as needed, and supplemented with reference numerals.
+
+**Figure 1. High-level system architecture of AutoResearch.**
+
+This figure shows the principal system blocks and the relationship between the user input, orchestration layer, specialized agents, retrieval tools, memory layers, and frontend event presentation.
+
+```mermaid
+flowchart TD
+    U[User Query]
+    API[Input Interface / API Layer]
+    O[Research Orchestrator]
+    P[Planner Agent]
+    X[Explorer Agent]
+    E[Extractor Agent]
+    C[Critic Agent]
+    S[Synthesizer Agent]
+    W[Web Retrieval Tools]
+    A[Academic Retrieval Tools]
+    SM[Session Memory]
+    LM[Long-Term Knowledge Store]
+    EB[Event Bus]
+    UI[Frontend Interface]
+
+    U --> API --> O
+    O --> P --> O
+    O --> X --> O
+    O --> E --> O
+    O --> C --> O
+    O --> S --> O
+
+    X --> W
+    X --> A
+
+    O <--> SM
+    P <--> LM
+    S --> LM
+
+    O --> EB --> UI
+```
+
+**Figure 2. State-machine research workflow with critique-driven refinement.**
+
+This figure shows the operational control logic in which the system decides whether to continue searching or proceed to synthesis based on critique output and iteration constraints.
+
+```mermaid
+flowchart TD
+    START([Start])
+    INIT[Initialize Session State]
+    PLAN[Plan Query into Sub-Questions]
+    EXPLORE[Run Parallel Retrieval]
+    EXTRACT[Normalize into Evidence Objects]
+    CRITIQUE[Evaluate Quality and Coverage]
+    DECIDE{Continue Refinement?}
+    REFINE[Generate Refinement Queries]
+    SYNTH[Generate Final Synthesis]
+    STORE[Persist Research Output]
+    STREAM[Emit Completion Events]
+    END([End])
+
+    START --> INIT --> PLAN --> EXPLORE --> EXTRACT --> CRITIQUE --> DECIDE
+    DECIDE -->|Yes| REFINE --> EXPLORE
+    DECIDE -->|No| SYNTH --> STORE --> STREAM --> END
+```
+
+**Figure 3. Evidence acquisition and normalization pipeline.**
+
+This figure emphasizes the transformation of heterogeneous source material into a normalized evidence representation that can be critiqued and synthesized consistently.
+
+```mermaid
+flowchart LR
+    SQ[Sub-Questions]
+    WR[Web Results]
+    AR[Academic Results]
+    RAW[Raw Findings Buffer]
+    DEDUPE[Deduplicate and Filter]
+    NORM[LLM Evidence Extraction]
+    EV[Structured Evidence Objects]
+    CR[Critique Inputs]
+    SY[ Synthesis Inputs ]
+
+    SQ --> WR
+    SQ --> AR
+    WR --> RAW
+    AR --> RAW
+    RAW --> DEDUPE --> NORM --> EV
+    EV --> CR
+    EV --> SY
+```
+
+**Figure 4. Shared state and memory interaction model.**
+
+This figure shows how in-flight session state differs from persistent long-term memory, and how both interact with the agents and final synthesis process.
+
+```mermaid
+flowchart TD
+    RS[ResearchState]
+    CFG[Runtime Configuration]
+    PLAN2[ResearchPlan]
+    EVID[All Evidence]
+    CRT[Critique]
+    SYN2[SynthesisReport]
+    SS[Session Store]
+    KS[Knowledge Store]
+    FUTURE[Future Research Session]
+
+    CFG --> RS
+    PLAN2 --> RS
+    EVID --> RS
+    CRT --> RS
+    SYN2 --> RS
+
+    RS <--> SS
+    SYN2 --> KS
+    KS --> FUTURE
+```
+
+**Figure 5. Real-time event-streaming architecture for client transparency.**
+
+This figure illustrates how the backend emits structured runtime events without tightly coupling the research engine to the frontend presentation layer.
+
+```mermaid
+flowchart LR
+    AGENTS[Planner / Explorer / Extractor / Critic / Synthesizer]
+    BUS[Per-Session Event Bus]
+    WS[WebSocket Endpoint]
+    STORE2[Frontend State Store]
+    FEED[Agent Activity Feed]
+    TREE[Research Tree]
+    PANEL[Evidence Panel]
+    REPORT[Report View]
+
+    AGENTS --> BUS --> WS --> STORE2
+    STORE2 --> FEED
+    STORE2 --> TREE
+    STORE2 --> PANEL
+    STORE2 --> REPORT
+```
+
+**Figure 6. Representative deployment topology.**
+
+This figure provides a deployment-oriented view showing how the client, backend, model services, retrieval providers, and persistence components may be arranged in a production or pre-production environment.
+
+```mermaid
+flowchart TD
+    CLIENT[Browser Client]
+    FRONT[Frontend Application]
+    BACK[FastAPI Backend]
+    MODEL[LLM Provider]
+    SEARCH[Search Providers]
+    CHROMA[ChromaDB Persistence]
+    LOGS[Operational Logging / Monitoring]
+
+    CLIENT --> FRONT --> BACK
+    BACK --> MODEL
+    BACK --> SEARCH
+    BACK --> CHROMA
+    BACK --> LOGS
+```
+
 ## Claim-Oriented Embodiments
 
 ### System Embodiment
@@ -673,6 +836,7 @@ When using this README as the core file in a patent preparation package, preserv
 
 - repository commit hash for the exact version being documented
 - PDF export of this README with creation date and version identifier
+- SVG, PDF, or image exports of Figures 1-6 from this README
 - `mermaid-diagram.png` and any additional architecture diagrams
 - representative screenshots of the frontend plan, evidence, and synthesis views
 - one or more sample research sessions with input, intermediate events, and final output
